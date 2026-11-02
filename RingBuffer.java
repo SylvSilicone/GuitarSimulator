@@ -1,4 +1,3 @@
-import java.util.Queue;
 public class RingBuffer 
 {
     double[] values;
@@ -6,46 +5,83 @@ public class RingBuffer
     int tail;
     public RingBuffer(int capacity)
     {
+        head = -1;
+        tail = 0;
         values = new double[(capacity)];
     }
 
     public int size()
     {
-        return values.length;
+        if (head == -1)
+            return 0;
+
+        if (tail > head)
+            return tail - head;
+
+        return values.length - head + tail;
     }
     
     public boolean isEmpty()
     {
-        return head == tail;
+        return head == tail -1;
     }
     
     public boolean isFull()
     {
-        return false;
+        return (tail + 1) % values.length == head;
     }
     
-    public void add(double value)
+    public void add(double value) throws ExceptionOverflow
     {
+        if (isFull())
+        {
+            throw new ExceptionOverflow("You are over the capacity");
+        }
 
+    if (isEmpty())
+    {
+        head = tail;
+    }
+        values[tail] = value;
+        tail = (tail + 1) % values.length;
     }
     
     public double peek()
     {
-        return 0.0;
+        return values[head];
     }
     
-    public double remove()
+    public double remove() throws UnderflowException
     {
-        return 0.0;
+        if (isEmpty())
+        {
+            throw new UnderflowException("Empty buffer");
+        }
+
+    double val = values[head];
+    head = (head + 1) % values.length;
+
+        if (head == tail)
+        {
+            head = -1;
+        }
+
+        return val;
+    }
+    public int getCapacity()
+    {
+        return values.length;
     }
     
     // a simple test of the constructor and methods in RingBuffer
-    public static void main(String[] args) 
+    public static void main(String[] args) throws ExceptionOverflow, UnderflowException
     {
         int capacity = 100;
         RingBuffer buffer = new RingBuffer(capacity);  
         for (int i = 1; i <= capacity; i++) 
+        {
             buffer.add(i);
+        }
       
         double t = buffer.remove();
         buffer.add(t);
