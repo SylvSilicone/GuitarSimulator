@@ -5,6 +5,7 @@ public class GuitarString
 {
     RingBuffer buffer;
     int SampleRate;
+    int count = 0;
     public GuitarString(double frequency) 
     {
         SampleRate = (int)(44100/frequency);
@@ -25,15 +26,29 @@ public class GuitarString
 
     public GuitarString(double[] array) 
     {
+        SampleRate = array.length;
+        buffer = new RingBuffer(SampleRate);
+        try
+        {
+            for(int i = 0; i < array.length; i++)
+            {
+                buffer.add(array[i]);
+            }
+        }
+        catch(ExceptionOverflow e)
+        {
+            System.out.println("Overflow Exception");
+        }
         // create a guitar string whose size and initial values are given by the array
     }
 
-    public void pluck() throws ExceptionOverflow
+    public void pluck() throws ExceptionOverflow, UnderflowException
     {
-        for(int i = 0; i < buffer.size(); i++)
+        for(int i = 0; i < buffer.getCapacity(); i++)
         {
-            double addition = Math.random()- 0.5;
-            buffer.add(addition);
+        buffer.remove();
+        double addition = Math.random() - 0.5;
+        buffer.add(addition);
         }
     }
 
@@ -44,18 +59,19 @@ public class GuitarString
         ticval = ticval*0.5;
         ticval = ticval * 0.994;
         buffer.add(ticval);
+        count++;
     }
 
     // return the current sample
-    public double sample() 
+    public double sample() throws UnderflowException
     {
-        return 0.0;
+        return buffer.peek();
     }
 
     // return number of times tic was called
     public int time() 
     {
-        return 0;
+        return count;
     }
 
     public static void main(String[] args) throws UnderflowException, ExceptionOverflow
