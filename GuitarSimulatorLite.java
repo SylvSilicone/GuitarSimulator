@@ -8,7 +8,7 @@
 
 public class GuitarSimulatorLite 
 {
-    public static void main(String[] args) 
+    public static void main(String[] args) throws ExceptionOverflow, UnderflowException
     {
         // Create two guitar strings, for concert A and C
         double CONCERT_A = 440.0;
